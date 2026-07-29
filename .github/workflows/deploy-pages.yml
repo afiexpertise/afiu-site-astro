@@ -19,32 +19,30 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      OKF_TOKEN: ${{ secrets.AFIU_OKF_TOKEN }}
     steps:
       - name: Checkout site
         uses: actions/checkout@v4
 
-      - name: Require the OKF access token
-        env:
-          OKF_TOKEN: ${{ secrets.AFIU_OKF_TOKEN }}
-        run: |
-          if [ -z "$OKF_TOKEN" ]; then
-            echo "::error::Configure the AFIU_OKF_TOKEN secret with read access to afiexpertise/afiu-okf-knowledge."
-            exit 1
-          fi
+      - name: Use bundled content snapshot
+        if: ${{ env.OKF_TOKEN == '' }}
+        run: echo "AFIU_OKF_TOKEN is not configured; building with bundled content."
 
       - name: Checkout French Canadian source
+        if: ${{ env.OKF_TOKEN != '' }}
         uses: actions/checkout@v4
         with:
           repository: afiexpertise/afiu-okf-knowledge
-          token: ${{ secrets.AFIU_OKF_TOKEN }}
+          token: ${{ env.OKF_TOKEN }}
           path: .content/fr-ca
 
       - name: Checkout English Canadian source
-        if: ${{ vars.OKF_EN_REPOSITORY != '' }}
+        if: ${{ vars.OKF_EN_REPOSITORY != '' && env.OKF_TOKEN != '' }}
         uses: actions/checkout@v4
         with:
           repository: ${{ vars.OKF_EN_REPOSITORY }}
-          token: ${{ secrets.AFIU_OKF_TOKEN }}
+          token: ${{ env.OKF_TOKEN }}
           path: .content/en-ca
 
       - name: Set up pnpm
@@ -65,6 +63,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Synchronize approved content
+        if: ${{ env.OKF_TOKEN != '' }}
         shell: bash
         run: |
           args=(--fr .content/fr-ca)

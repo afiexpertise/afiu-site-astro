@@ -38,11 +38,11 @@ Le workflow `.github/workflows/deploy-pages.yml` :
 4. compile Astro en fichiers statiques;
 5. déploie l’artifact sur GitHub Pages.
 
-Configuration requise dans les paramètres du dépôt :
+Configuration des paramètres du dépôt :
 
 | Type | Nom | Valeur |
 | --- | --- | --- |
-| Secret Actions | `AFIU_OKF_TOKEN` | Jeton en lecture sur les dépôts OKF et de traduction |
+| Secret Actions | `AFIU_OKF_TOKEN` | Jeton en lecture sur les dépôts OKF et de traduction (optionnel : requis pour synchroniser les sources distantes) |
 | Variable Actions | `OKF_EN_REPOSITORY` | Dépôt EN-CA au format `organisation/depot` (optionnel tant qu’il n’existe pas) |
 
 Dans **Settings → Pages**, choisir **GitHub Actions** comme source. Le dépôt OKF ou l’automatisation de traduction peut déclencher une republication avec l’événement `repository_dispatch` de type `okf-content-updated`.
