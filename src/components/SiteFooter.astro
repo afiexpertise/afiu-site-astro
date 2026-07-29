@@ -1,0 +1,27 @@
+---
+import BrandMark from './BrandMark.astro';
+import { t, withBase, type Locale } from '@/i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = t(locale);
+---
+
+<footer class="border-t border-border bg-background-secondary py-10">
+  <div class="site-container flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+    <div class="flex items-center gap-3">
+      <BrandMark class="h-8 w-8" />
+      <div>
+        <p class="font-display font-bold">AFIU</p>
+        <p class="text-sm text-foreground-muted">{copy.footer}</p>
+      </div>
+    </div>
+    <nav class="flex gap-5 text-sm font-medium text-foreground-muted">
+      <a class="hover:text-foreground" href={withBase(`/${locale}/`)}>{copy.navHome}</a>
+      <a class="hover:text-foreground" href={withBase(`/${locale}/formations/`)}>{copy.navTraining}</a>
+    </nav>
+  </div>
+</footer>

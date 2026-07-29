@@ -1,0 +1,67 @@
+---
+import '@/styles/site.css';
+import { ClientRouter } from 'astro:transitions';
+import SiteHeader from '@/components/SiteHeader.astro';
+import SiteFooter from '@/components/SiteFooter.astro';
+import { t, type Locale } from '@/i18n';
+
+interface Props {
+  locale: Locale;
+  title?: string;
+  description?: string;
+}
+
+const { locale, title, description } = Astro.props;
+const copy = t(locale);
+const siteName = 'AFIU';
+const pageTitle = title ? `${title} · ${siteName}` : siteName;
+const pageDescription = description || copy.heroDescription;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const alternateLocale = locale === 'fr-ca' ? 'en-ca' : 'fr-ca';
+const currentLocalePath = Astro.url.pathname.split(`/${locale}/`)[1] ?? '';
+const alternatePath = currentLocalePath.startsWith('formations/') && currentLocalePath !== 'formations/'
+  ? 'formations/'
+  : currentLocalePath;
+const alternateUrl = new URL(
+  `${import.meta.env.BASE_URL}${alternateLocale}/${alternatePath}`,
+  Astro.site,
+);
+---
+
+<!doctype html>
+<html lang={locale} class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <meta name="theme-color" content="#f94c10" />
+    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang={locale} href={canonical} />
+    <link rel="alternate" hreflang={alternateLocale} href={alternateUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:locale" content={locale.replace('-', '_')} />
+    <ClientRouter />
+    <script is:inline>
+      (() => {
+        const stored = localStorage.getItem('theme');
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.classList.toggle('dark', stored === 'dark' || (!stored && systemDark));
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen bg-background text-foreground antialiased">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">
+      {copy.skip}
+    </a>
+    <SiteHeader locale={locale} />
+    <main id="main-content" class="min-h-screen">
+      <slot />
+    </main>
+    <SiteFooter locale={locale} />
+  </body>
+</html>

@@ -1,0 +1,18 @@
+---
+import { defaultLocale, withBase } from '@/i18n';
+
+const destination = withBase(`/${defaultLocale}/`);
+---
+
+<!doctype html>
+<html lang="fr-CA">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="refresh" content={`0;url=${destination}`} />
+    <link rel="canonical" href={destination} />
+    <title>AFIU</title>
+  </head>
+  <body>
+    <a href={destination}>Continuer vers le site AFIU</a>
+  </body>
+</html>

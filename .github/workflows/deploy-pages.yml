@@ -1,0 +1,95 @@
+name: Deploy Astro to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  repository_dispatch:
+    types: [okf-content-updated]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout site
+        uses: actions/checkout@v4
+
+      - name: Require the OKF access token
+        env:
+          OKF_TOKEN: ${{ secrets.AFIU_OKF_TOKEN }}
+        run: |
+          if [ -z "$OKF_TOKEN" ]; then
+            echo "::error::Configure the AFIU_OKF_TOKEN secret with read access to afiexpertise/afiu-okf-knowledge."
+            exit 1
+          fi
+
+      - name: Checkout French Canadian source
+        uses: actions/checkout@v4
+        with:
+          repository: afiexpertise/afiu-okf-knowledge
+          token: ${{ secrets.AFIU_OKF_TOKEN }}
+          path: .content/fr-ca
+
+      - name: Checkout English Canadian source
+        if: ${{ vars.OKF_EN_REPOSITORY != '' }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.OKF_EN_REPOSITORY }}
+          token: ${{ secrets.AFIU_OKF_TOKEN }}
+          path: .content/en-ca
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Synchronize approved content
+        shell: bash
+        run: |
+          args=(--fr .content/fr-ca)
+          if [ -d .content/en-ca ]; then
+            args+=(--en .content/en-ca)
+          fi
+          pnpm sync:content -- "${args[@]}"
+
+      - name: Build static site
+        env:
+          SITE_URL: https://afiexpertise.github.io
+        run: pnpm build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,41 @@
+---
+import { getCollection } from 'astro:content';
+import FormationCard from '@/components/FormationCard.astro';
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import { catalogueEntries } from '@/lib/content';
+import { isLocale, locales, t, type Locale } from '@/i18n';
+
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale } }));
+}
+
+const localeParam = Astro.params.locale;
+if (!isLocale(localeParam)) throw new Error(`Unsupported locale: ${localeParam}`);
+const locale: Locale = localeParam;
+const copy = t(locale);
+const formations = catalogueEntries(await getCollection('formations'), locale);
+---
+
+<SiteLayout locale={locale} title={copy.trainingTitle} description={copy.trainingDescription}>
+  <section class="pb-20 pt-36">
+    <div class="site-container">
+      <div class="max-w-3xl">
+        <p class="mb-4 text-sm font-semibold uppercase tracking-wider text-brand-500">AFIU · OKF</p>
+        <h1 class="font-display text-4xl font-bold md:text-6xl">{copy.trainingTitle}</h1>
+        <p class="mt-5 text-lg text-foreground-muted">{copy.trainingDescription}</p>
+      </div>
+      {
+        formations.length > 0 ? (
+          <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {formations.map((entry) => <FormationCard entry={entry} locale={locale} />)}
+          </div>
+        ) : (
+          <div class="mt-12 rounded-2xl border border-dashed border-border bg-card p-12 text-center">
+            <h2 class="font-display text-2xl font-bold">{copy.emptyTitle}</h2>
+            <p class="mt-2 text-foreground-muted">{copy.emptyDescription}</p>
+          </div>
+        )
+      }
+    </div>
+  </section>
+</SiteLayout>

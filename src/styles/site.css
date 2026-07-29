@@ -1,0 +1,104 @@
+@import './global.css';
+
+@layer components {
+  .site-container {
+    width: min(100% - 2rem, 72rem);
+    margin-inline: auto;
+  }
+
+  .glass-header {
+    background: color-mix(in oklch, var(--background) 86%, transparent);
+    border: 1px solid color-mix(in oklch, var(--border) 82%, transparent);
+    box-shadow: 0 14px 40px rgb(0 0 0 / 8%);
+    backdrop-filter: blur(18px);
+  }
+
+  .hero-grid {
+    background-image:
+      linear-gradient(to right, color-mix(in oklch, var(--border) 45%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklch, var(--border) 45%, transparent) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: linear-gradient(to bottom, black, transparent 90%);
+  }
+
+  .content-prose {
+    color: var(--color-foreground-secondary);
+    line-height: 1.75;
+  }
+
+  .content-prose :is(h1, h2, h3, h4) {
+    color: var(--color-foreground);
+    margin-block: 2.25rem 1rem;
+    scroll-margin-top: 7rem;
+  }
+
+  .content-prose h1 {
+    display: none;
+  }
+
+  .content-prose h2 {
+    font-size: var(--text-2xl);
+  }
+
+  .content-prose h3 {
+    font-size: var(--text-xl);
+  }
+
+  .content-prose :is(p, ul, ol, pre, table, blockquote) {
+    margin-block: 1rem;
+  }
+
+  .content-prose :is(ul, ol) {
+    padding-left: 1.5rem;
+  }
+
+  .content-prose ul {
+    list-style: disc;
+  }
+
+  .content-prose ol {
+    list-style: decimal;
+  }
+
+  .content-prose a {
+    color: var(--color-brand-500);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .content-prose code {
+    border-radius: 0.35rem;
+    background: var(--color-secondary);
+    padding: 0.15rem 0.35rem;
+    font-size: 0.9em;
+  }
+
+  .content-prose pre {
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+  }
+
+  .content-prose pre code {
+    background: transparent;
+    padding: 0;
+  }
+
+  .content-prose blockquote {
+    border-left: 3px solid var(--color-brand-500);
+    padding-left: 1rem;
+    color: var(--color-foreground-muted);
+  }
+
+  .content-prose table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .content-prose :is(th, td) {
+    border: 1px solid var(--color-border);
+    padding: 0.7rem;
+    text-align: left;
+  }
+}

@@ -1,0 +1,17 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import { defaultLocale, t, withBase } from '@/i18n';
+
+const copy = t(defaultLocale);
+---
+
+<SiteLayout locale={defaultLocale} title={copy.notFound}>
+  <section class="site-container flex min-h-[75vh] flex-col items-center justify-center pt-24 text-center">
+    <p class="font-display text-8xl font-bold text-brand-500">404</p>
+    <h1 class="mt-6 font-display text-3xl font-bold">{copy.notFound}</h1>
+    <p class="mt-3 text-foreground-muted">{copy.notFoundDescription}</p>
+    <a class="mt-8 rounded-xl bg-primary px-5 py-3 font-semibold text-primary-foreground" href={withBase(`/${defaultLocale}/`)}>
+      {copy.backHome}
+    </a>
+  </section>
+</SiteLayout>
