@@ -1,0 +1,57 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import AssistantLearningPath from '@/components/AssistantLearningPath.astro';
+import { assistantPathCommon, assistantPathTracks } from '@/lib/assistantPath';
+import { withBase } from '@/i18n';
+
+export function getStaticPaths() {
+  return [{ params: { locale: 'fr-ca' } }];
+}
+---
+
+<SiteLayout
+  locale="fr-ca"
+  title="Parcours de formation — Assistants IA"
+  description="Un parcours modulaire : un tronc commun pour apprendre à travailler avec l'IA, puis des spécialisations par assistant."
+>
+  <section class="pb-20 pt-36">
+    <div class="site-container">
+      <div class="max-w-4xl">
+        <p class="mb-4 text-sm font-semibold uppercase tracking-wider text-brand-500">AFIU · Parcours IA</p>
+        <h1 class="font-display text-4xl font-bold tracking-tight md:text-6xl">
+          Apprendre à travailler avec les assistants IA
+        </h1>
+        <p class="mt-5 max-w-3xl text-lg leading-relaxed text-foreground-muted">
+          Le parcours commence par trois modules communs : comprendre l’IA générative, apprendre à formuler une bonne
+          demande, puis piloter une conversation jusqu’au résultat. À partir du module 3, le participant choisit
+          l’environnement qu’il utilise réellement : Microsoft Copilot, Microsoft 365 Copilot, ChatGPT, Claude ou
+          Mistral Vibe.
+        </p>
+        <div class="mt-7 flex flex-wrap gap-3">
+          <span class="rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold">M0 · 120 min</span>
+          <span class="rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold">M1+ · 3 h 30</span>
+          <span class="rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold">30 % théorie · 60 % pratique · 10 % groupe</span>
+        </div>
+      </div>
+
+      <AssistantLearningPath common={assistantPathCommon} tracks={assistantPathTracks} />
+
+      <div class="mt-10 rounded-2xl border border-border bg-background-secondary p-6 md:flex md:items-center md:justify-between md:gap-8">
+        <div>
+          <h2 class="font-display text-xl font-bold">Chaque bloc est une formation autonome</h2>
+          <p class="mt-2 max-w-3xl text-sm leading-relaxed text-foreground-muted">
+            Survolez un module pour faire apparaître l’accès à sa fiche, puis ouvrez-la pour consulter les compétences,
+            l’agenda, le fil rouge, les questions de groupe et les critères de validation issus de la source OKF.
+          </p>
+        </div>
+        <a
+          href={withBase('/fr-ca/formations/')}
+          class="mt-5 inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:-translate-y-0.5 hover:bg-primary-hover md:mt-0"
+        >
+          Voir le catalogue
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</SiteLayout>

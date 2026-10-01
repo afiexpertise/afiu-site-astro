@@ -45,7 +45,7 @@ export function catalogueEntries(entries: FormationEntry[], locale: Locale): For
   for (const entry of localized) {
     const key = entry.data.course_id || entrySlug(entry).replace(/\/course$/, '');
     const current = byCourse.get(key);
-    if (!current || entry.data.type === 'CourseIndex') byCourse.set(key, entry);
+    if (!current || entry.data.type === 'Course') byCourse.set(key, entry);
   }
 
   return [...byCourse.values()].sort((a, b) => entryTitle(a).localeCompare(entryTitle(b), locale));
