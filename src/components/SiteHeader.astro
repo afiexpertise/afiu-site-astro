@@ -10,13 +10,17 @@ const { locale } = Astro.props;
 const copy = t(locale);
 const alternate = locale === 'fr-ca' ? 'en-ca' : 'fr-ca';
 const currentLocalePath = Astro.url.pathname.split(`/${locale}/`)[1] ?? '';
-const alternatePath = currentLocalePath.startsWith('formations/') && currentLocalePath !== 'formations/'
-  ? 'formations/'
-  : currentLocalePath;
+const alternatePath =
+  currentLocalePath.startsWith('formations/') && currentLocalePath !== 'formations/'
+    ? 'formations/'
+    : currentLocalePath.startsWith('parcours-assistants-ia')
+      ? 'formations/'
+      : currentLocalePath;
 const localePath = `/${alternate}/${alternatePath}`;
 const alternateHref = withBase(localePath.replace(import.meta.env.BASE_URL.replace(/\/$/, ''), ''));
 const homeHref = withBase(`/${locale}/`);
 const trainingHref = withBase(`/${locale}/formations/`);
+const assistantPathHref = withBase('/fr-ca/parcours-assistants-ia/');
 ---
 
 <header class="fixed inset-x-0 top-0 z-50">
@@ -33,6 +37,16 @@ const trainingHref = withBase(`/${locale}/formations/`);
       <a class="rounded-lg px-3 py-2 text-sm font-medium text-foreground-muted transition hover:bg-secondary hover:text-foreground" href={trainingHref}>
         {copy.navTraining}
       </a>
+      {
+        locale === 'fr-ca' && (
+          <a
+            class="rounded-lg px-3 py-2 text-sm font-medium text-foreground-muted transition hover:bg-secondary hover:text-foreground"
+            href={assistantPathHref}
+          >
+            {copy.navAssistantPath}
+          </a>
+        )
+      }
     </nav>
 
     <div class="flex items-center gap-1">
