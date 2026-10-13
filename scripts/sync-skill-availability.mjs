@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 
 const repository = 'afiexpertise/afiu-okf-knowledge';
@@ -57,8 +57,24 @@ if (token) {
   } catch (error) {
     console.warn(`Could not verify OKF package assets: ${error.message}. No links will be shown.`);
   }
-} else {
-  console.log('No AFIU_OKF_TOKEN: OKF releases cannot be verified. Downloads hidden.');
+ } else {
+  // GitHub Pages may build without a private-OKF token. Retain only a snapshot
+  // previously verified against a real immutable private OKF Release.
+  try {
+    const previous = JSON.parse(await readFile(output, 'utf8'));
+    const expected = `https://github.com/${repository}/releases/download/${previous.tag}/`;
+    const valid = /^skills-[0-9a-f]{12}$/.test(previous.tag ?? '') &&
+      previous.repository === repository &&
+      Object.entries(previous.packages ?? {}).every(([name, url]) =>
+        /^(?:[a-z0-9]+(?:-[a-z0-9]+)*)-(?:apprenant|formateur)\.zip$/.test(name) &&
+        url === expected + name);
+    if (valid && Object.keys(previous.packages).length > 0) {
+      catalogue = previous;
+      console.warn(`No private OKF token: using previously verified immutable release ${previous.tag}. Configure AFIU_OKF_TOKEN for automatic refresh.`);
+    }
+  } catch {
+    // Without a verified published snapshot, no download link is enabled.
+  }
 }
 await mkdir(dirname(output), { recursive: true });
 await writeFile(output, JSON.stringify(catalogue, null, 2) + '\n', 'utf8');
