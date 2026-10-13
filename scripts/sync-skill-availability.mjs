@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 
@@ -5,6 +6,12 @@ const repository = 'afiexpertise/afiu-okf-knowledge';
 const output = resolve('src/generated/okf-skills.json');
 const token = process.env.AFIU_OKF_TOKEN || process.env.OKF_TOKEN || '';
 const blank = { repository, tag: null, revision: null, packages: {}, checkedAt: null };
+let sourceRevision = null;
+try {
+  sourceRevision = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: resolve('.content/fr-ca'), encoding: 'utf8' }).trim();
+} catch {
+  console.log('OKF checkout not available; verifying release assets without a source revision.');
+}
 let catalogue = blank;
 
 if (token) {
@@ -21,6 +28,9 @@ if (token) {
       const release = await response.json();
       const tag = release.tag_name;
       if (!/^skills-[0-9a-f]{12}$/.test(tag)) throw new Error('Unexpected OKF release tag format');
+      if (sourceRevision && !sourceRevision.startsWith(tag.slice(7))) {
+        throw new Error('Published Skills release does not match the checked-out OKF revision');
+      }
       const assets = {};
       for (const asset of release.assets ?? []) {
         const name = asset.name;

@@ -1,13 +1,14 @@
 ---
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import SiteLayout from '@/layouts/SiteLayout.astro';
+import CourseSkillDownloads from '@/components/CourseSkillDownloads.astro';
 import { entryDescription, entryLocale, entrySlug, entryTitle, isPublished } from '@/lib/content';
 import { isLocale, t, withBase, type Locale } from '@/i18n';
 
 export async function getStaticPaths() {
   const entries = await getCollection('formations');
   return entries
-    .filter(isPublished)
+    .filter((entry) => isPublished(entry) && entry.data.type === 'Course' && entrySlug(entry).endsWith('/course'))
     .flatMap((entry) => {
       const locale = entryLocale(entry);
       const slug = entrySlug(entry);
@@ -27,6 +28,7 @@ const copy = t(locale);
 const title = entryTitle(entry);
 const { Content } = await render(entry);
 const crumbs = entrySlug(entry).split('/');
+const courseSlug = crumbs.at(-2) ?? '';
 ---
 
 <SiteLayout locale={locale} title={title} description={entryDescription(entry, locale)}>
@@ -54,6 +56,7 @@ const crumbs = entrySlug(entry).split('/');
       <div class="content-prose mt-10 max-w-4xl">
         <Content />
       </div>
+      <CourseSkillDownloads slug={courseSlug} locale={locale} />
     </div>
   </article>
 </SiteLayout>

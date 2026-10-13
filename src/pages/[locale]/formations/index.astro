@@ -1,60 +1,35 @@
 ---
 import { getCollection } from 'astro:content';
-import FormationCard from '@/components/FormationCard.astro';
 import SiteLayout from '@/layouts/SiteLayout.astro';
-import { catalogueEntries } from '@/lib/content';
+import TrainingPathExplorer from '@/components/TrainingPathExplorer.astro';
 import { isLocale, locales, t, withBase, type Locale } from '@/i18n';
 
 export function getStaticPaths() {
   return locales.map((locale) => ({ params: { locale } }));
 }
-
 const localeParam = Astro.params.locale;
 if (!isLocale(localeParam)) throw new Error(`Unsupported locale: ${localeParam}`);
 const locale: Locale = localeParam;
 const copy = t(locale);
-const formations = catalogueEntries(await getCollection('formations'), locale);
+const entries = await getCollection('formations');
 ---
-
 <SiteLayout locale={locale} title={copy.trainingTitle} description={copy.trainingDescription}>
   <section class="pb-20 pt-36">
     <div class="site-container">
-      <div class="max-w-3xl">
-        <p class="mb-4 text-sm font-semibold uppercase tracking-wider text-brand-500">AFIU · OKF</p>
-        <h1 class="font-display text-4xl font-bold md:text-6xl">{copy.trainingTitle}</h1>
-        <p class="mt-5 text-lg text-foreground-muted">{copy.trainingDescription}</p>
+      <div class="max-w-4xl">
+        <p class="mb-4 text-sm font-semibold uppercase tracking-wider text-brand-500">AFIU · Courses as Code · OKF</p>
+        <h1 class="font-display text-4xl font-bold tracking-tight md:text-6xl">{copy.trainingTitle}</h1>
+        <p class="mt-5 text-lg leading-relaxed text-foreground-muted">
+          {locale === 'fr-ca'
+            ? 'Parcourez le cursus, choisissez une spécialisation et ouvrez les cours. Les ressources des formateurs proviennent directement du dépôt OKF, sans copie sur ce site.'
+            : 'Explore the curriculum, choose a specialization and open a course. Trainer resources link directly to the OKF repository, never copied onto this site.'}
+        </p>
       </div>
-
-      {
-        locale === 'fr-ca' && (
-          <a
-            href={withBase('/fr-ca/parcours-assistants-ia/')}
-            class="group mt-10 flex flex-col gap-5 rounded-2xl border border-brand-500/30 bg-brand-500/5 p-6 transition hover:-translate-y-0.5 hover:border-brand-500/60 hover:shadow-lg md:flex-row md:items-center md:justify-between"
-          >
-            <div>
-              <span class="text-xs font-bold uppercase tracking-wider text-brand-600">Nouveau parcours</span>
-              <h2 class="mt-2 font-display text-2xl font-bold">Assistants IA — du tronc commun aux spécialisations produit</h2>
-              <p class="mt-2 max-w-3xl text-sm leading-relaxed text-foreground-muted">
-                Visualisez le cursus complet et ouvrez chaque bloc pour consulter la fiche détaillée du module.
-              </p>
-            </div>
-            <span class="shrink-0 font-semibold text-brand-600 transition group-hover:translate-x-1">Explorer le parcours →</span>
-          </a>
-        )
-      }
-
-      {
-        formations.length > 0 ? (
-          <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {formations.map((entry) => <FormationCard entry={entry} locale={locale} />)}
-          </div>
-        ) : (
-          <div class="mt-12 rounded-2xl border border-dashed border-border bg-card p-12 text-center">
-            <h2 class="font-display text-2xl font-bold">{copy.emptyTitle}</h2>
-            <p class="mt-2 text-foreground-muted">{copy.emptyDescription}</p>
-          </div>
-        )
-      }
+      <TrainingPathExplorer entries={entries} locale={locale} />
+      {locale === 'fr-ca' &&
+        <a href={withBase('/fr-ca/parcours-assistants-ia/')} class="mt-8 inline-flex rounded-xl border border-border bg-card px-5 py-3 text-sm font-semibold hover:border-brand-500">
+          Comprendre la progression du parcours IA →
+        </a>}
     </div>
   </section>
 </SiteLayout>

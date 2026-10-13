@@ -16,6 +16,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "sync:content": "node scripts/sync-content.mjs",
+    "sync:skills": "node scripts/sync-skill-availability.mjs",
     "validate": "pnpm lint && pnpm check && pnpm build"
   },
   "dependencies": {
