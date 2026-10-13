@@ -1,0 +1,29 @@
+name: Validate public AFIU site
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Refresh unverified download status
+        run: pnpm sync:skills
+      - name: Validate Astro, types, lint and build
+        run: pnpm validate
+      - name: Assert private OKF resources are excluded
+        run: node scripts/assert-public-output.mjs

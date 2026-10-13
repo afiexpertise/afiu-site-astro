@@ -59,3 +59,26 @@ Dans **Settings → Pages**, choisir **GitHub Actions** comme source. Le dépôt
 | `pnpm validate` | Validation complète |
 
 Les éléments du système visuel Velocity sont utilisés sous licence MIT; voir `THIRD_PARTY_NOTICES`.
+
+## Catalogue interactif et téléchargements de Skills
+
+- Les pages `/fr-ca/formations/` et `/fr-ca/parcours-assistants-ia/` présentent les cours sous forme de parcours filtrables (texte, spécialisation, disponibilité des Skills).
+- Les groupes et l'ordre sont déduits directement de la section « Positionnement dans le cursus » ou de la section « Parcours » des `course.md` synchronisés depuis l'OKF. Aucune liste parallèle de cours n'est entretenue sur le site.
+- Sur chaque fiche de cours, les Skills apprenant et formateur renvoient **uniquement** aux fichiers ZIP d'une Release publiée dans [l'OKF privé](https://github.com/afiexpertise/afiu-okf-knowledge/releases). Aucune archive n'est hébergée par Astro.
+- `pnpm sync:skills` vérifie avec un jeton serveur `AFIU_OKF_TOKEN` les assets de la dernière Release. Si le jeton est absent, le site conserve uniquement un **index figé des liens déjà vérifiés** d'une Release OKF immuable. Ces URL restent dans GitHub OKF et ne sont pas des copies de Skills.
+- Pour actualiser automatiquement ces liens à chaque mise à jour OKF, configurer `AFIU_OKF_TOKEN` côté site et `AFIU_SITE_DISPATCH_TOKEN` côté OKF. Avec un jeton configuré, une Release absente ou ne correspondant pas au code source synchronisé laisse les téléchargements indisponibles.
+- `pnpm sync:content -- --fr <okf-path>` copie seulement les `course.md` destinés au catalogue public; il exclut les `SKILL.md`, contenus d'évaluation et supports internes, même lorsqu'ils existent dans l'OKF.
+- Les formateurs qui téléchargent un ZIP doivent avoir accès au dépôt privé OKF dans GitHub. Aucun jeton de service n'est transmis au navigateur.
+- Après une compilation publiée, le workflow OKF peut déclencher un nouveau déploiement Astro via `repository_dispatch` si le secret optionnel `AFIU_SITE_DISPATCH_TOKEN` est configuré côté OKF. Sinon, lancer un déploiement manuel du site.
+- Les contenus `course.md` en statut draft restent repérables comme brouillons; les validations automatiques de packaging ne constituent pas une approbation pédagogique.
+
+### Validation locale
+
+```bash
+pnpm install --frozen-lockfile
+pnpm sync:content -- --fr ../afiu-okf-knowledge
+AFIU_OKF_TOKEN=<read-only-github-token> pnpm sync:skills
+pnpm validate
+```
+
+Le jeton dans cet exemple reste dans un environnement autorisé. Ne jamais le committer ni l'exposer dans un bundle frontal.

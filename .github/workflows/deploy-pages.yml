@@ -72,6 +72,11 @@ jobs:
           fi
           pnpm sync:content -- "${args[@]}"
 
+      - name: Verify downloads in OKF GitHub Releases
+        env:
+          AFIU_OKF_TOKEN: ${{ secrets.AFIU_OKF_TOKEN }}
+        run: pnpm sync:skills
+
       - name: Build static site
         env:
           SITE_URL: https://afiexpertise.github.io
