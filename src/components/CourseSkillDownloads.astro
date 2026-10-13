@@ -1,0 +1,55 @@
+---
+import { okfCourseSource, okfReleasesUrl, releaseVersion, skillDownload } from '@/lib/skills';
+interface Props { slug: string; locale: 'fr-ca' | 'en-ca'; }
+const { slug, locale } = Astro.props;
+const trainer = skillDownload(slug, 'formateur');
+const learner = skillDownload(slug, 'apprenant');
+const revision = releaseVersion();
+const fr = locale === 'fr-ca';
+const heading = fr ? 'Ressources pour les formateurs' : 'Trainer resources';
+---
+<aside class="mt-10 rounded-2xl border border-border bg-background-secondary p-6 md:p-8" aria-label={heading}>
+  <div class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <p class="text-xs font-bold uppercase tracking-wider text-brand-500">OKF · Courses as Code</p>
+      <h2 class="mt-2 font-display text-2xl font-bold">{heading}</h2>
+      <p class="mt-2 max-w-2xl text-sm leading-relaxed text-foreground-muted">
+        {fr
+          ? "Les Skills sont compilés et conservés exclusivement dans les téléchargements du dépôt GitHub OKF privé. Les accès autorisés à ce dépôt sont requis."
+          : "Skills are built and stored only in the private OKF GitHub repository's downloads. Authorized GitHub access is required."}
+      </p>
+    </div>
+    <a href={okfCourseSource(slug)} target="_blank" rel="noopener noreferrer" class="rounded-xl border border-border bg-card px-4 py-2 text-sm font-semibold hover:border-brand-500">
+      {fr ? 'Voir le cours source ↗' : 'View source course ↗'}
+    </a>
+  </div>
+  <div class="mt-6 grid gap-3 md:grid-cols-2">
+    {([
+      { title: fr ? 'Skill formateur' : 'Trainer Skill', detail: fr ? 'Préparation, animation, approfondissement et évaluation' : 'Preparation, facilitation, expertise and assessment', href: trainer },
+      { title: fr ? 'Skill apprenant' : 'Learner Skill', detail: fr ? 'Mise en pratique et transfert des apprentissages' : 'Practice and transfer of learning', href: learner },
+    ]).map((item) => (
+      <div class="rounded-xl border border-border bg-card p-5">
+        <div class="flex items-center justify-between gap-3">
+          <h3 class="font-display text-lg font-bold">{item.title}</h3>
+          <span class:list={['rounded-full px-2.5 py-1 text-xs font-semibold', item.href ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' : 'bg-secondary text-foreground-muted']}>
+            {item.href ? (fr ? 'Compilé dans OKF' : 'Published in OKF') : (fr ? 'Non publié' : 'Not published')}
+          </span>
+        </div>
+        <p class="mt-2 min-h-10 text-sm text-foreground-muted">{item.detail}</p>
+        {item.href
+          ? <a href={item.href} target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary-hover">
+              {fr ? 'Télécharger depuis OKF ↗' : 'Download from OKF ↗'}
+            </a>
+          : <p class="mt-4 text-sm font-medium text-foreground-muted">{fr ? "Le téléchargement sera activé après publication et vérification de l’archive GitHub." : 'Available after GitHub ZIP publication and verification.'}</p>}
+      </div>
+    ))}
+  </div>
+  <p class="mt-4 text-xs leading-relaxed text-foreground-muted">
+    {revision
+      ? (fr ? `Révision OKF publiée : ${revision}. ` : `Published OKF revision: ${revision}. `)
+      : (fr ? 'Aucune version compilée confirmée lors de la construction du site. ' : 'No compiled release confirmed during the site build. ')}
+    <a href={okfReleasesUrl} target="_blank" rel="noopener noreferrer" class="font-semibold underline underline-offset-2">
+      {fr ? 'Consulter les versions dans GitHub ↗' : 'Browse GitHub releases ↗'}
+    </a>
+  </p>
+</aside>
